@@ -1,9 +1,11 @@
 
 // DATOS
 const numeroCartas = 16;
-const imagenesDorsoCartas = ['./images/Tnf.png'];
+//Array con las imagenes del Dorso proporcionadas
+const imagenesDorsoCartas = [];
 let imagenDorso;
-const imagenesCartas = ['./images/Tnf.png'];
+//Array con las distintas imágenes proporcionadas
+const imagenesCartas = [];
 
 
 //VISTAS
@@ -23,7 +25,7 @@ function generaCartas(){
     
 
     //Vamos a trabajar con un array de imágenes que se va a ir reduciendo para tener cada vez menos imágenes.
-    let imagenesDorsorestantes ;
+    let imagenesRestantes ;
 
     //Las imágenes se van a generar por parejas, y estas pueden ser reconocidas iguales por la imagen
     for(i=0; i< numeroCartas/2 ; i++){
@@ -78,7 +80,6 @@ function inicioPartida(){
 
 function cartaPulsada(e){
     //Antes de darle la vuelta a la carta, se debe comprobar que en el tablero no hay dos cartas dadas la vuelta
-    //Si sólo hay una carta bocaarriba y se pulsa, esta se vuelve a dar la vuelta sin considerarse un intento
 
     //Si después de pulsar la carta, hay dos cartas boca arriba, hay que comprobar si son iguales o no
 }
@@ -91,67 +92,4 @@ function darVueltaCarta(idCarta){
         (e.id === idCarta) ? e.setAttribute('src',imagenDorso) : e;
     })
     numCartasBocaArriba--;
-}
-
-
-//Qué otras funciones se nos ocurren ?? ?
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-function parejaResuelta(){
-
-}
-
-function partidaGanada(){
-
 }
