@@ -2,10 +2,9 @@
 
 body {
     font-family: Arial, sans-serif;
-    background-image: url('/images/fondoCanario.png');
-    background-size: cover; /* Ajusta la imagen para cubrir todo el fondo */
+    background-size: cover;
     background-repeat: no-repeat;
-    background-attachment: fixed; /* Fija el fondo para que no se desplace con el contenido */
+    background-attachment: fixed;
     background-position: center;
     padding: 0;
     margin: 0;
@@ -25,14 +24,14 @@ header {
 
 .memory-board {
     display: grid;
-    grid-template-columns: repeat(4, 1fr); /* 4 columnas */
-    grid-template-rows: repeat(4, 1fr); /* 4 filas */
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
     gap: 10px;
     margin: 0 auto;
     max-width: 800px;
-    height: 400px; /* Ajusta la altura según tus necesidades */
-    justify-content: center; /* Centra la cuadrícula horizontalmente */
-    align-content: center; /* Centra la cuadrícula verticalmente */
+    height: 400px;
+    justify-content: center;
+    align-content: center;
 }
 
 .card {
