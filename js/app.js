@@ -40,6 +40,7 @@ let partida = {
 }
 
 function mezclarCartas(cartas) {
+
     for (let i = cartas.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [cartas[i], cartas[j]] = [cartas[j], cartas[i]];
@@ -48,7 +49,6 @@ function mezclarCartas(cartas) {
 }
 
 function generaCartas() {
-    console.log('generar');
 
     // Vamos a trabajar con un array de imágenes que se va a ir reduciendo para tener cada vez menos imágenes.
     // Las imágenes se van a generar por parejas
@@ -81,14 +81,11 @@ function generaCartas() {
 }
 
 function obtenImagenDorso() {
-    console.log('obtenImagenDorso');
     let numAleatorio = Math.floor(Math.random() * 2); // 0 o 1
-    console.log(numAleatorio);
     imagenDorso = imagenesDorsoCartas[numAleatorio];
 }
 
 function dibujaCartas() {
-    console.log('dibujaCartas');
     arrayCartas.forEach((e) => {
         let nuevaCarta = document.createElement('img');
         nuevaCarta.classList.add('card'); // Clase corregida
@@ -107,81 +104,120 @@ function inicioPartida() {
     generaCartas();
     dibujaCartas();
     btn.disabled = true;
-    console.log('hasta aqui');
 }
 
-function cartaPulsada(e) {
-    // Incrementar el número de intentos cada vez que se pulsa una carta
-    partida.numIntentosTotales++;
 
-    const intentosElement = document.getElementById('intentos');
-    intentosElement.textContent = 'Intentos: ' + partida.numIntentosTotales;
-    
+// Función que se ejecuta cuando se hace clic en una carta
+function cartaPulsada(e) {
+    // Obtiene la carta seleccionada y su ID
     const cartaSeleccionada = e.target;
     const idCartaSeleccionada = parseInt(cartaSeleccionada.id);
+    const carta = arrayCartas[idCartaSeleccionada];
 
-    // Si la carta ya está boca arriba o es una pareja resuelta, no hacer nada
-    if (arrayCartas[idCartaSeleccionada].estado === 'bocaarriba' || arrayCartas[idCartaSeleccionada].estado === 'resuelta') {
-        return;
+    // Verifica si la carta está boca abajo para evitar acciones innecesarias
+    if (carta.estado === 'bocaabajo') {
+        // Voltea visualmente la carta seleccionada
+        darVueltaCartaVisual(cartaSeleccionada, carta.imagen);
+        // Cambia el estado de la carta en el modelo (de 'bocaabajo' a 'bocaarriba')
+        voltearCarta(carta);
+        // Incrementa el contador de cartas boca arriba
+        partida.numCartasBocaArriba++;
+
+        // Filtra las cartas que están boca arriba en el modelo
+        const cartasBocaArriba = arrayCartas.filter(carta => carta.estado === 'bocaarriba');
+
+        // Si hay dos cartas boca arriba
+        if (cartasBocaArriba.length === 2) {
+            // Comprueba si las dos cartas boca arriba forman una pareja
+            if (cartasBocaArriba[0].imagen === cartasBocaArriba[1].imagen) {
+                // Marca las cartas como resueltas en el modelo
+                cartasBocaArriba.forEach(carta => carta.estado = 'resuelta');
+                // Actualiza la interfaz para reflejar la resolución de la pareja
+                parejasResueltas();
+            } else {
+                // Si las cartas no coinciden, las voltea de nuevo después de un breve período de tiempo
+                setTimeout(() => {
+                    darVueltaCartasBocaAbajo(cartasBocaArriba);
+                }, 1000); // Esperar 1 segundo antes de voltear las cartas boca abajo
+            }
+            // Reinicia el contador de cartas boca arriba
+            partida.numCartasBocaArriba = 0;
+        }
+        // Comprueba si el juego ha sido ganado
+        ganar();
     }
+}
 
-    buscarParejas();
-
-    // Voltear la carta seleccionada
-    cartaSeleccionada.setAttribute('src', arrayCartas[idCartaSeleccionada].imagen);
-    arrayCartas[idCartaSeleccionada].estado = 'bocaarriba';
-    partida.numCartasBocaArriba++;
-
-
-
-    ganar();
-
+// Función para dar vuelta visualmente las cartas boca abajo
+function darVueltaCartasBocaAbajo(cartas) {
+    cartas.forEach(carta => {
+        carta.estado = 'bocaabajo';
+        // Obtiene el elemento visual de la carta por su ID y le asigna la imagen del dorso
+        document.getElementById(carta.id).setAttribute('src', imagenDorso);
+        actualizarVistaCartas();
+    });
+    // Suma un intento cada vez que se dan vuelta las cartas boca abajo
+    sumarIntentos();
 }
 
 
-function darVueltaCarta(idCarta) {
-    //Debemos buscar en el array de modelos de cartas y establecer su estado como bocaabajo
-
-    //Debemos buscar en el array de las vistas de CArtas la carta por el id, y asignarle la imagenDorso
-    cartasMesa.forEach((e) => {
-        (e.id === idCarta) ? e.setAttribute('src', imagenDorso) : e;
-    })
-    numCartasBocaArriba--;
+function actualizarVistaCartas() {
+    arrayCartas.forEach(carta => {
+        const cartaVisual = document.getElementById(carta.id);
+        if (carta.estado === 'bocaarriba') {
+            // Si la carta está boca arriba, muestra su imagen
+            cartaVisual.setAttribute('src', carta.imagen);
+        } else {
+            // Si la carta está boca abajo, muestra el dorso
+            cartaVisual.setAttribute('src', imagenDorso);
+        }
+    });
 }
 
+
+
+function darVueltaCartaVisual(cartaVisual, imagen) {
+    cartaVisual.setAttribute('src', imagen);
+}
+
+function voltearCarta(carta) {
+    carta.estado = 'bocaarriba';
+}
 
 
 function ganar() {
     // Comprobar si todas las parejas se han resuelto para determinar si el juego ha terminado
     if (partida.numParejasResueltas === numeroCartas / 2) {
         partida.estado = 'fin'; // Marcar el estado del juego como 'fin' cuando se han resuelto todas las parejas
-        ('¡Felicidades! Has completado el juego.');
+        alert('¡Felicidades! Has completado el juego.');
+        reiniciarJuego(); // Puedes implementar esta función para reiniciar el juego después de ganar
     }
 }
 
-function buscarParejas() {
-    // Comprobar si hay dos cartas boca arriba para verificar si forman una pareja
-    if (partida.numCartasBocaArriba === 2) {
-        const cartasBocaArriba = arrayCartas.filter(carta => carta.estado === 'bocaarriba');
 
-        // Si las cartas tienen la misma imagen, forman una pareja
-        if (cartasBocaArriba[0].imagen === cartasBocaArriba[1].imagen) {
-            cartasBocaArriba.forEach(carta => {
-                carta.estado = 'resuelta'; // Marcar las cartas como resueltas
-            });
-            partida.numParejasResueltas++;
-            const parejasResueltasElement = document.getElementById('parejas-resueltas');
-            parejasResueltasElement.textContent = 'Parejas resueltas: ' + partida.numParejasResueltas;
-        } else {
-            // Si las cartas no coinciden, voltear las cartas después de un breve período de tiempo (por ejemplo, 1 segundo)
-            setTimeout(() => {
-                cartasBocaArriba.forEach(carta => {
-                    carta.estado = 'bocaabajo';
-                    document.getElementById(carta.id).setAttribute('src', imagenDorso); // Voltear la carta boca abajo
-                });
-            }, 50);
-        }
+function voltearCartasBocaAbajo(cartas) {
+    cartas.forEach(carta => {
+        carta.estado = 'bocaabajo';
+        document.getElementById(carta.id).setAttribute('src', imagenDorso);
+    });
+    sumarIntentos();
+}
 
-        partida.numCartasBocaArriba = 0; // Reiniciar el contador de cartas boca arriba después de comprobar las parejas
-    }
+
+
+
+function sumarIntentos() {
+    // Incrementar el número de intentos cada vez que se pulsa una carta
+    partida.numIntentosTotales++;
+
+    const intentosElement = document.getElementById('intentos');
+    intentosElement.textContent = 'Intentos: ' + partida.numIntentosTotales;
+}
+
+function parejasResueltas() {
+    // Incrementar el número de parejas resueltas
+    partida.numParejasResueltas++;
+
+    const parejasResueltasElement = document.getElementById('parejas-resueltas');
+    parejasResueltasElement.textContent = 'Parejas resueltas: ' + partida.numParejasResueltas;
 }
