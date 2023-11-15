@@ -1,12 +1,9 @@
 // DATOS
 const numeroCartas = 8;
-//Array con las imagenes del Dorso proporcionadas
 const imagenesDorsoCartas = [
     'images/Dorso/DorsoComida.jpg',
     'images/Dorso/DorsoComida2.jpg'
 ];
-let imagenDorso;
-//Array con las distintas imágenes proporcionadas
 const imagenesCartas = [
     '/images/Imagenes/Charco Tacoron - El Hierro.jpg',
     '/images/Imagenes/La Graciosa G.png',
@@ -21,14 +18,13 @@ const imagenesCartas = [
 ];
 
 //VISTAS
-const mantelCartas = document.querySelector(".memory-board"); // Selector corregido
+const mantelCartas = document.querySelector(".memory-board");
 let cartasMesa = null;
-
 let arrayCartas = [];
+let imagenDorso;
 
 
-//escuchar el button para llamar al inicioPartida
-btn = document.querySelector('.inicio'); // Selector corregido
+btn = document.querySelector('.inicio');
 btn.addEventListener('click', inicioPartida);
 
 //MODELO 
@@ -38,6 +34,10 @@ let partida = {
     numCartasBocaArriba: 0,
     numIntentosTotales: 0
 }
+
+// ----------------------------------------------------------------
+//    ---------- CREAMOS Y DIBUJAMOS LAS CARTAS ----------------
+// ----------------------------------------------------------------
 
 function mezclarCartas(cartas) {
 
@@ -49,11 +49,6 @@ function mezclarCartas(cartas) {
 }
 
 function generaCartas() {
-
-    // Vamos a trabajar con un array de imágenes que se va a ir reduciendo para tener cada vez menos imágenes.
-    // Las imágenes se van a generar por parejas
-
-
     const parejas = [];
 
     while (parejas.length < numeroCartas / 2) {
@@ -106,14 +101,20 @@ function inicioPartida() {
     btn.disabled = true;
 }
 
+// ----------------------------------------------------------------
+//          ---------- MANEJO DEL JUEGO ----------------
+// ----------------------------------------------------------------
+
+
 
 // Función que se ejecuta cuando se hace clic en una carta
 function cartaPulsada(e) {
     // Obtiene la carta seleccionada y su ID
     const cartaSeleccionada = e.target;
     const idCartaSeleccionada = parseInt(cartaSeleccionada.id);
+    console.log(idCartaSeleccionada);
     const carta = arrayCartas[idCartaSeleccionada];
-
+    console.log(arrayCartas);
     // Verifica si la carta está boca abajo para evitar acciones innecesarias
     if (carta.estado === 'bocaabajo') {
         // Voltea visualmente la carta seleccionada
@@ -122,7 +123,6 @@ function cartaPulsada(e) {
         voltearCarta(carta);
         // Incrementa el contador de cartas boca arriba
         partida.numCartasBocaArriba++;
-
         // Filtra las cartas que están boca arriba en el modelo
         const cartasBocaArriba = arrayCartas.filter(carta => carta.estado === 'bocaarriba');
 
@@ -132,12 +132,17 @@ function cartaPulsada(e) {
             if (cartasBocaArriba[0].imagen === cartasBocaArriba[1].imagen) {
                 // Marca las cartas como resueltas en el modelo
                 cartasBocaArriba.forEach(carta => carta.estado = 'resuelta');
+                console.log('dos resueltas');
+
                 // Actualiza la interfaz para reflejar la resolución de la pareja
-                parejasResueltas();
+                sumarparejasResueltas();
+                console.log(cartasBocaArriba);
             } else {
                 // Si las cartas no coinciden, las voltea de nuevo después de un breve período de tiempo
                 setTimeout(() => {
-                    darVueltaCartasBocaAbajo(cartasBocaArriba);
+                    darVueltaCartasBocaAbajo();
+                    actualizarVistaCartas();
+                    console.log('else', cartasBocaArriba);
                 }, 1000); // Esperar 1 segundo antes de voltear las cartas boca abajo
             }
             // Reinicia el contador de cartas boca arriba
@@ -149,13 +154,17 @@ function cartaPulsada(e) {
 }
 
 // Función para dar vuelta visualmente las cartas boca abajo
-function darVueltaCartasBocaAbajo(cartas) {
-    cartas.forEach(carta => {
-        carta.estado = 'bocaabajo';
-        // Obtiene el elemento visual de la carta por su ID y le asigna la imagen del dorso
-        document.getElementById(carta.id).setAttribute('src', imagenDorso);
-        actualizarVistaCartas();
+function darVueltaCartasBocaAbajo() {
+    console.log('darVueltaCartaVisual');
+    arrayCartas.forEach(carta => {
+        if (carta.estado === 'bocaarriba') {
+            carta.estado = 'bocaabajo';
+            // Obtiene el elemento visual de la carta por su ID y le asigna la imagen del dorso
+            document.getElementById(carta.id).src = imagenDorso;
+        }
     });
+
+
     // Suma un intento cada vez que se dan vuelta las cartas boca abajo
     sumarIntentos();
 }
@@ -164,13 +173,13 @@ function darVueltaCartasBocaAbajo(cartas) {
 function actualizarVistaCartas() {
     arrayCartas.forEach(carta => {
         const cartaVisual = document.getElementById(carta.id);
-        if (carta.estado === 'bocaarriba') {
-            // Si la carta está boca arriba, muestra su imagen
-            cartaVisual.setAttribute('src', carta.imagen);
+        if (carta.estado === 'resuelta') {
+            //cartaVisual.setAttribute('src', carta.imagen);
         } else {
-            // Si la carta está boca abajo, muestra el dorso
             cartaVisual.setAttribute('src', imagenDorso);
         }
+
+
     });
 }
 
@@ -190,7 +199,6 @@ function ganar() {
     if (partida.numParejasResueltas === numeroCartas / 2) {
         partida.estado = 'fin'; // Marcar el estado del juego como 'fin' cuando se han resuelto todas las parejas
         alert('¡Felicidades! Has completado el juego.');
-        reiniciarJuego(); // Puedes implementar esta función para reiniciar el juego después de ganar
     }
 }
 
@@ -214,7 +222,7 @@ function sumarIntentos() {
     intentosElement.textContent = 'Intentos: ' + partida.numIntentosTotales;
 }
 
-function parejasResueltas() {
+function sumarparejasResueltas() {
     // Incrementar el número de parejas resueltas
     partida.numParejasResueltas++;
 
