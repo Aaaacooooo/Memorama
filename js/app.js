@@ -83,7 +83,7 @@ function obtenImagenDorso() {
 function dibujaCartas() {
     arrayCartas.forEach((e) => {
         let nuevaCarta = document.createElement('img');
-        nuevaCarta.classList.add('card'); // Clase corregida
+        nuevaCarta.classList.add('card');
         nuevaCarta.setAttribute('id', e.id);
         nuevaCarta.setAttribute('src', imagenDorso);
         nuevaCarta.addEventListener('click', cartaPulsada);
@@ -112,9 +112,8 @@ function cartaPulsada(e) {
     // Obtiene la carta seleccionada y su ID
     const cartaSeleccionada = e.target;
     const idCartaSeleccionada = parseInt(cartaSeleccionada.id);
-    console.log(idCartaSeleccionada);
-    const carta = arrayCartas[idCartaSeleccionada];
-    console.log(arrayCartas);
+    const carta = arrayCartas.filter(carta => carta.id === idCartaSeleccionada)[0];
+
     // Verifica si la carta está boca abajo para evitar acciones innecesarias
     if (carta.estado === 'bocaabajo') {
         // Voltea visualmente la carta seleccionada
@@ -125,6 +124,7 @@ function cartaPulsada(e) {
         partida.numCartasBocaArriba++;
         // Filtra las cartas que están boca arriba en el modelo
         const cartasBocaArriba = arrayCartas.filter(carta => carta.estado === 'bocaarriba');
+        console.log(cartasBocaArriba);
 
         // Si hay dos cartas boca arriba
         if (cartasBocaArriba.length === 2) {
@@ -143,7 +143,7 @@ function cartaPulsada(e) {
                     darVueltaCartasBocaAbajo();
                     actualizarVistaCartas();
                     console.log('else', cartasBocaArriba);
-                }, 1000); // Esperar 1 segundo antes de voltear las cartas boca abajo
+                }, 2000); // Esperar 1 segundo antes de voltear las cartas boca abajo
             }
             // Reinicia el contador de cartas boca arriba
             partida.numCartasBocaArriba = 0;
@@ -173,13 +173,9 @@ function darVueltaCartasBocaAbajo() {
 function actualizarVistaCartas() {
     arrayCartas.forEach(carta => {
         const cartaVisual = document.getElementById(carta.id);
-        if (carta.estado === 'resuelta') {
-            //cartaVisual.setAttribute('src', carta.imagen);
-        } else {
+        if (carta.estado === 'bocaabajo') {
             cartaVisual.setAttribute('src', imagenDorso);
         }
-
-
     });
 }
 
