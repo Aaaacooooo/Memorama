@@ -113,18 +113,21 @@ function cartaPulsada(e) {
     const cartaSeleccionada = e.target;
     const idCartaSeleccionada = parseInt(cartaSeleccionada.id);
     const carta = arrayCartas.filter(carta => carta.id === idCartaSeleccionada)[0];
-
+    
     // Verifica si la carta está boca abajo para evitar acciones innecesarias
     if (carta.estado === 'bocaabajo') {
-        // Voltea visualmente la carta seleccionada
-        darVueltaCartaVisual(cartaSeleccionada, carta.imagen);
-        // Cambia el estado de la carta en el modelo (de 'bocaabajo' a 'bocaarriba')
-        voltearCarta(carta);
+        if (arrayCartas.filter(carta => carta.estado === 'bocaarriba').length < 2) {
+            // Voltea visualmente la carta seleccionada
+            darVueltaCartaVisual(cartaSeleccionada, carta.imagen);
+            // Cambia el estado de la carta en el modelo (de 'bocaabajo' a 'bocaarriba')
+            voltearCarta(carta);
+        }
         // Incrementa el contador de cartas boca arriba
         partida.numCartasBocaArriba++;
-        // Filtra las cartas que están boca arriba en el modelo
+        
+        //Filtramos las cartas que están bocaarriba
         const cartasBocaArriba = arrayCartas.filter(carta => carta.estado === 'bocaarriba');
-        console.log(cartasBocaArriba);
+
 
         // Si hay dos cartas boca arriba
         if (cartasBocaArriba.length === 2) {
@@ -132,18 +135,14 @@ function cartaPulsada(e) {
             if (cartasBocaArriba[0].imagen === cartasBocaArriba[1].imagen) {
                 // Marca las cartas como resueltas en el modelo
                 cartasBocaArriba.forEach(carta => carta.estado = 'resuelta');
-                console.log('dos resueltas');
-
                 // Actualiza la interfaz para reflejar la resolución de la pareja
                 sumarparejasResueltas();
-                console.log(cartasBocaArriba);
             } else {
                 // Si las cartas no coinciden, las voltea de nuevo después de un breve período de tiempo
                 setTimeout(() => {
                     darVueltaCartasBocaAbajo();
                     actualizarVistaCartas();
-                    console.log('else', cartasBocaArriba);
-                }, 2000); // Esperar 1 segundo antes de voltear las cartas boca abajo
+                }, 2000); // Esperar 2   segundo antes de voltear las cartas boca abajo
             }
             // Reinicia el contador de cartas boca arriba
             partida.numCartasBocaArriba = 0;
@@ -153,9 +152,9 @@ function cartaPulsada(e) {
     }
 }
 
+
 // Función para dar vuelta visualmente las cartas boca abajo
 function darVueltaCartasBocaAbajo() {
-    console.log('darVueltaCartaVisual');
     arrayCartas.forEach(carta => {
         if (carta.estado === 'bocaarriba') {
             carta.estado = 'bocaabajo';
@@ -199,20 +198,10 @@ function ganar() {
 }
 
 
-function voltearCartasBocaAbajo(cartas) {
-    cartas.forEach(carta => {
-        carta.estado = 'bocaabajo';
-        document.getElementById(carta.id).setAttribute('src', imagenDorso);
-    });
-    sumarIntentos();
-}
-
-
-
-
 function sumarIntentos() {
     // Incrementar el número de intentos cada vez que se pulsa una carta
     partida.numIntentosTotales++;
+    console.log(partida.numIntentosTotales);
 
     const intentosElement = document.getElementById('intentos');
     intentosElement.textContent = 'Intentos: ' + partida.numIntentosTotales;
