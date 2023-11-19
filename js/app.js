@@ -1,5 +1,5 @@
 // DATOS
-const numeroCartas = 8;
+const numeroCartas = 2;
 const imagenesDorsoCartas = [
     'images/Dorso/DorsoComida.jpg',
     'images/Dorso/DorsoComida2.jpg'
@@ -15,13 +15,13 @@ const imagenesCartas = [
     '/images/Imagenes/Roque Nublo GC.png',
     '/images/Imagenes/Teide TNF.png',
     '/images/Imagenes/Timanfaya  LNZ.png',
-    '/images/Imagenes/carreteraTenerife.png',
+    '/images/Imagenes/carreteraTenerife.jpg',
     '/images/Imagenes/corralejo.jpg',
     '/images/Imagenes/Hierro.webp',
-    '/images/Imagenes/HierroEden.jpg',
+    '/images/Imagenes/HierroeEden.jpg',
     '/images/Imagenes/IsladeLobos.jpg',
     '/images/Imagenes/punta-brava.jpg',
-    '/images/Imagenes/temerifeplaya.jpg',   
+    '/images/Imagenes/temerifeplaya.jpg',
 ];
 
 //VISTAS
@@ -29,6 +29,13 @@ const mantelCartas = document.querySelector(".memory-board");
 let cartasMesa = null;
 let arrayCartas = [];
 let imagenDorso;
+
+
+//TIEMPO
+let segundos = 0;
+let minutos = 0;
+let tiempo;
+
 
 
 btn = document.querySelector('.inicio');
@@ -105,7 +112,9 @@ function inicioPartida() {
     obtenImagenDorso();
     generaCartas();
     dibujaCartas();
+    iniciarContadorTiempo();
     btn.disabled = true;
+    console.log(arrayCartas);
 }
 
 // ----------------------------------------------------------------
@@ -147,9 +156,9 @@ function cartaPulsada(e) {
                 } else {
                     // Si las cartas no coinciden, las voltea de nuevo después de un breve período de tiempo
                     setTimeout(() => {
-                        console.log('setTiemout');
                         darVueltaCartasBocaAbajo();
                         actualizarVistaCartas();
+                        animacion(cartasBocaArriba)
                         // Suma un intento cada vez que se dan vuelta las cartas boca abajo
                         sumarIntentos();
                     }, 2000); // Esperar 2   segundo antes de voltear las cartas boca abajo
@@ -162,6 +171,19 @@ function cartaPulsada(e) {
         }
     }
 }
+
+//Función para la añadir animación
+function animacion(cartas) {
+
+    cartas.forEach(carta => {
+        const cartaVisual = document.getElementById(carta.id);
+        cartaVisual.classList.add('girar');
+        setTimeout(() => {
+            cartaVisual.classList.remove('girar');
+        }, 300);
+    })
+}
+
 
 
 // Función para dar vuelta visualmente las cartas boca abajo
@@ -181,6 +203,11 @@ function actualizarVistaCartas() {
         const cartaVisual = document.getElementById(carta.id);
         if (carta.estado === 'bocaabajo') {
             cartaVisual.setAttribute('src', imagenDorso);
+            // Agrega la clase para la animación de giro
+            cartaVisual.classList.add('girar');
+            setTimeout(() => {
+                cartaVisual.classList.remove('girar');
+            }, 300);
         }
     });
 }
@@ -218,10 +245,97 @@ function sumarparejasResueltas() {
 function ganar() {
     // Comprobar si todas las parejas se han resuelto para determinar si el juego ha terminado
     if (partida.numParejasResueltas === numeroCartas / 2) {
-        partida.estado = 'fin'; // Marcar el estado del juego como 'fin' cuando se han resuelto todas las parejas
-        alert('¡Felicidades! Has completado el juego.');
+        detenerContadorTiempo();
+        partida.estado = 'fin';
+
+        // Actualiza los detalles en el mensaje final
+        document.getElementById('intentos-modal').textContent = document.getElementById('intentos').textContent;
+        document.getElementById('parejas-resueltas-modal').textContent = document.getElementById('parejas-resueltas').textContent;
+        document.getElementById('tiempo-final').textContent = document.getElementById('tiempo').textContent;
+
+        // Muestra el mensaje final
+        const mensajeFinal = document.getElementById('mensaje-final');
+        mensajeFinal.style.display = 'flex';
+
+        // Evento para reiniciar el juego al hacer clic en el botón de reiniciar
+        document.getElementById('reiniciar').addEventListener('click', () => {
+            mensajeFinal.style.display = 'none'; // Oculta el mensaje
+            reiniciarJuego(); // Lógica para reiniciar el juego
+        });
     }
+
 }
+
+function reiniciarJuego() {
+    // Reiniciar contadores y variables
+    partida.numIntentosTotales = 0;
+    document.getElementById('intentos').textContent = 'Intentos: ' + partida.numIntentosTotales;
+    partida.numParejasResueltas = 0;
+    document.getElementById('parejas-resueltas').textContent = 'Parejas resueltas: ' + partida.numParejasResueltas;
+    partida.estado = 'inicio'; // Ajusta el estado del juego según tu lógica
+
+    // Reiniciar tiempo
+    reiniciarContadorTiempo();
+
+    arrayCartas.forEach(carta => {
+        // Eliminar la carta del html
+        document.getElementById(carta.id).remove();
+    });
+
+    // Limpiar el array de cartas
+    arrayCartas = [];
+
+
+
+    console.log(arrayCartas);
+
+    // Ocultar el mensaje final si está visible
+    const mensajeFinal = document.getElementById('mensaje-final');
+    if (mensajeFinal.style.display === 'flex') {
+        mensajeFinal.style.display = 'none';
+    }
+
+    btn.disabled = false;
+
+}
+
+
+// ----------------------------------------------------------------
+//          ---------- MANEJO DEL TIEMPO ----------------
+// ----------------------------------------------------------------
+
+
+function iniciarContadorTiempo() {
+    tiempo = setInterval(actualizarTiempo, 1000); // Actualiza el tiempo cada segundo (1000 ms)
+}
+
+function detenerContadorTiempo() {
+    clearInterval(tiempo); // Detiene el contador de tiempo
+}
+
+function reiniciarContadorTiempo() {
+    detenerContadorTiempo();
+    segundos = 0;
+    minutos = 0;
+    document.getElementById('tiempo').textContent = 'Tiempo: 00:00';
+}
+
+function actualizarTiempo() {
+    segundos++;
+
+    if (segundos === 60) {
+        segundos = 0;
+        minutos++;
+    }
+
+    const tiempoMostrado = `${minutos < 10 ? '0' + minutos : minutos}:${segundos < 10 ? '0' + segundos : segundos}`;
+    document.getElementById('tiempo').innerText = `Tiempo: ${tiempoMostrado}`;
+}
+
+
+
+
+
 
 
 

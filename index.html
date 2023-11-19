@@ -15,6 +15,8 @@
 
         <p id="intentos">Intentos: 0</p>
         <p id="parejas-resueltas">Parejas resueltas: 0</p>
+        <!-- mostrar el tiempo -->
+        <div id="tiempo">Tiempo: 00:00</div>
 
         <div class="memory-board">
             <!-- Aquí se generarán las cartas -->
@@ -27,6 +29,18 @@
             <button id="modal-cerrar">Cerrar</button>
         </div>
         <button class="inicio">Inicio</button>
+
+        <!-- Estructura básica del mensaje de felicitación -->
+        <div id="mensaje-final" class="modal">
+            <div class="modal-contenido">
+                <h2>Felicidades, ¡has completado el juego!</h2>
+                <p>Número de intentos: <span id="intentos-modal">0</span></p>
+                <p>Número de parejas resueltas: <span id="parejas-resueltas-modal">0</span></p>
+                <p>Tiempo: <span id="tiempo-final">00:00</span></p>
+                <button id="reiniciar">Reiniciar</button>
+            </div>
+        </div>
+
 
     </main>
     <script src="/js/app.js"></script>
