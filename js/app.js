@@ -114,7 +114,6 @@ function inicioPartida() {
     dibujaCartas();
     iniciarContadorTiempo();
     btn.disabled = true;
-    console.log(arrayCartas);
 }
 
 // ----------------------------------------------------------------
@@ -173,11 +172,8 @@ function cartaPulsada(e) {
 }
 
 function buscarIsla(carta) {
-    console.log(carta);
     const urlCarta = carta.imagen; // URL de la primera carta boca arriba
-    console.log(urlCarta);
     const nombreIslaCarta = obtenerNombreIsla(urlCarta);
-
     const informacionIsla = obtenerInformacion(nombreIslaCarta); // Obtener información sobre la isla
 
     // Mostrar la información de la isla en la ventana modal
@@ -259,6 +255,7 @@ function animacion(cartas) {
     })
 }
 
+
 // Lógica para abrir y cerrar la ventana modal
 function abrirVentanaModal(imagen, nombreIsla, informacionIsla) {
     detenerContadorTiempo(); // Detener el contador de tiempo
@@ -278,23 +275,24 @@ function abrirVentanaModal(imagen, nombreIsla, informacionIsla) {
         carta = document.getElementById(carta.id)
         carta.style.display = 'none';
     })
-    
 
-    // Cerrar la ventana modal después de 8 segundos
-    setTimeout(() => {
+    let modalCerrarTimeout = setTimeout(() => {
         modalCerrar.style.display = 'block';
-        console.log('cerrar');
+        console.log(modalCerrar.style.display);
     }, 2000);
 
     // Evento para cerrar la ventana modal
     modalCerrar.addEventListener('click', () => {
-        console.log('cerrar modal');
+        console.log('cerrar');
         modal.style.display = 'none';
+        modalCerrar.style.display = 'none';
         arrayCartas.forEach(carta => {
             carta = document.getElementById(carta.id)
             carta.style.display = 'block';
         })
+        clearTimeout(modalCerrarTimeout);
         reiniciarContadorTiempo(); // Reiniciar el contador de tiempo
+        ganar();
     });
 }
 
