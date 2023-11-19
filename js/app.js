@@ -128,7 +128,6 @@ function cartaPulsada(e) {
             //Filtramos las cartas que están bocaarriba
             const cartasBocaArriba = arrayCartas.filter(carta => carta.estado === 'bocaarriba');
 
-
             // Si hay dos cartas boca arriba
             if (cartasBocaArriba.length === 2) {
                 // Comprueba si las dos cartas boca arriba forman una pareja
@@ -214,4 +213,35 @@ function ganar() {
         partida.estado = 'fin'; // Marcar el estado del juego como 'fin' cuando se han resuelto todas las parejas
         alert('¡Felicidades! Has completado el juego.');
     }
+}
+
+
+
+// Lógica para abrir y cerrar la ventana modal
+function abrirVentanaModal(imagen, nombreIsla, informacionIsla) {
+    detenerContadorTiempo(); // Detener el contador de tiempo
+    const modal = document.getElementById('modal');
+    const modalContenido = document.getElementById('modal-contenido');
+    const modalCerrar = document.getElementById('modal-cerrar');
+
+    // Mostrar contenido en la ventana modal
+    modalContenido.innerHTML = `
+        <img src="${imagen}" alt="Imagen de la isla" />
+        <h2>${nombreIsla}</h2>
+        <p>${informacionIsla}</p>
+        <button id="cerrar-modal">Cerrar</button>
+    `;
+
+    modal.style.display = 'block'; // Mostrar la ventana modal
+
+    // Cerrar la ventana modal después de 8 segundos
+    setTimeout(() => {
+        modalCerrar.style.display = 'block';
+    }, 8000);
+
+    // Evento para cerrar la ventana modal
+    modalCerrar.addEventListener('click', () => {
+        modal.style.display = 'none';
+        reiniciarContadorTiempo(); // Reiniciar el contador de tiempo
+    });
 }
