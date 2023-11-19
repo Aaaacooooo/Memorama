@@ -15,6 +15,13 @@ const imagenesCartas = [
     '/images/Imagenes/Roque Nublo GC.png',
     '/images/Imagenes/Teide TNF.png',
     '/images/Imagenes/Timanfaya  LNZ.png',
+    '/images/Imagenes/carreteraTenerife.png',
+    '/images/Imagenes/corralejo.jpg',
+    '/images/Imagenes/Hierro.webp',
+    '/images/Imagenes/HierroEden.jpg',
+    '/images/Imagenes/IsladeLobos.jpg',
+    '/images/Imagenes/punta-brava.jpg',
+    '/images/Imagenes/temerifeplaya.jpg',   
 ];
 
 //VISTAS
@@ -104,6 +111,7 @@ function inicioPartida() {
 // ----------------------------------------------------------------
 //          ---------- MANEJO DEL JUEGO ----------------
 // ----------------------------------------------------------------
+
 
 
 
