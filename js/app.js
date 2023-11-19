@@ -114,6 +114,7 @@ function inicioPartida() {
     dibujaCartas();
     iniciarContadorTiempo();
     btn.disabled = true;
+    manejoLocalStorage()
 }
 
 // ----------------------------------------------------------------
@@ -171,14 +172,35 @@ function cartaPulsada(e) {
     }
 }
 
+//Función para la añadir animación
+function animacion(cartas) {
+
+    cartas.forEach(carta => {
+        const cartaVisual = document.getElementById(carta.id);
+        cartaVisual.classList.add('girar');
+        setTimeout(() => {
+            cartaVisual.classList.remove('girar');
+        }, 300);
+    })
+}
+
+
+// ----------------------------------------------------------------
+//          ---------- MODAL ----------------
+// ----------------------------------------------------------------
+
+let timeoutAbrirModal;
+
 function buscarIsla(carta) {
     const urlCarta = carta.imagen; // URL de la primera carta boca arriba
     const nombreIslaCarta = obtenerNombreIsla(urlCarta);
     const informacionIsla = obtenerInformacion(nombreIslaCarta); // Obtener información sobre la isla
 
-    // Mostrar la información de la isla en la ventana modal
-    abrirVentanaModal(obtenerImagen(nombreIslaCarta), nombreIslaCarta, informacionIsla);
-
+    
+    timeoutAbrirModal = setTimeout(() => {
+        abrirVentanaModal(obtenerImagen(nombreIslaCarta), nombreIslaCarta, informacionIsla);
+    }, 2000);
+    
 }
 
 function obtenerNombreIsla(url) {
@@ -242,23 +264,10 @@ function obtenerImagen(nombreIsla) {
     return imagenesIslas[nombreIsla];
 }
 
-
-//Función para la añadir animación
-function animacion(cartas) {
-
-    cartas.forEach(carta => {
-        const cartaVisual = document.getElementById(carta.id);
-        cartaVisual.classList.add('girar');
-        setTimeout(() => {
-            cartaVisual.classList.remove('girar');
-        }, 300);
-    })
-}
-
-
 // Lógica para abrir y cerrar la ventana modal
 function abrirVentanaModal(imagen, nombreIsla, informacionIsla) {
     detenerContadorTiempo(); // Detener el contador de tiempo
+
     const modal = document.getElementById('modal');
     const modalContenido = document.getElementById('modal-contenido');
     const modalCerrar = document.getElementById('modal-cerrar');
@@ -271,29 +280,79 @@ function abrirVentanaModal(imagen, nombreIsla, informacionIsla) {
     `;
 
     modal.style.display = 'block'; // Mostrar la ventana modal
-    arrayCartas.forEach(carta => {
-        carta = document.getElementById(carta.id)
-        carta.style.display = 'none';
-    })
 
+    // Ocultar las cartas
+    arrayCartas.forEach(carta => {
+        document.getElementById(carta.id).style.display = 'none';
+    });
+
+    // Configurar el temporizador para mostrar el botón de cierre después de 2 segundos
     let modalCerrarTimeout = setTimeout(() => {
         modalCerrar.style.display = 'block';
-        console.log(modalCerrar.style.display);
     }, 2000);
 
     // Evento para cerrar la ventana modal
     modalCerrar.addEventListener('click', () => {
-        console.log('cerrar');
         modal.style.display = 'none';
         modalCerrar.style.display = 'none';
+
+        // Mostrar las cartas nuevamente
         arrayCartas.forEach(carta => {
-            carta = document.getElementById(carta.id)
-            carta.style.display = 'block';
-        })
+            document.getElementById(carta.id).style.display = 'block';
+        });
+
         clearTimeout(modalCerrarTimeout);
+        clearTimeout(timeoutAbrirModal);
         reiniciarContadorTiempo(); // Reiniciar el contador de tiempo
-        ganar();
+        ganar(); // Lógica para verificar si se ha ganado el juego
     });
+    // Lógica de manejo de localStorage
+    manejoLocalStorage();
+}
+
+
+// ----------------------------------------------------------------
+//          ---------- LOCALSTORAGE ----------------
+// ----------------------------------------------------------------
+
+
+function manejoLocalStorage() {
+    // Obtener el mejor registro desde localStorage
+    const mejorRegistroGuardado = localStorage.getItem('mejorRegistro');
+
+    // Si hay un registro guardado previamente, analizarlo como JSON
+    const mejorRegistroParseado = mejorRegistroGuardado ? JSON.parse(mejorRegistroGuardado) : null;
+
+    // Supongamos que tienes el registro actual en una variable llamada 'registroActual'
+    // Esto sería una representación simplificada, deberías tener tu lógica para obtener estos valores
+    const registroActual = {
+        intentos: 0,
+        aciertos: 0,
+        tiempoTotal: '00:00' // segundos
+    };
+    console.log(registroActual);
+
+    // Comparar el registro actual con el mejor registro guardado (si existe)
+    if (
+        !mejorRegistroParseado ||
+        registroActual.intentos < mejorRegistroParseado.intentos ||
+        registroActual.aciertos > mejorRegistroParseado.aciertos ||
+        registroActual.tiempoTotal < mejorRegistroParseado.tiempoTotal
+    ) {
+        // Si el registro actual supera al mejor registro guardado o si no hay registro guardado previamente,
+        // actualiza el mejor registro en localStorage
+        localStorage.setItem('mejorRegistro', JSON.stringify(registroActual));
+    }
+
+    // Mostrar los datos en un cuadro al inicio de la partida
+    const puntuacionAnterior = document.getElementById('puntuacion-anterior');
+    if (mejorRegistroGuardado) {
+        const mejorRegistroParseado = JSON.parse(mejorRegistroGuardado);
+        puntuacionAnterior.innerText = `Intentos: ${mejorRegistroParseado.intentos}, Aciertos: ${mejorRegistroParseado.aciertos}, Tiempo Total: ${mejorRegistroParseado.tiempoTotal}`;
+    } else {
+        puntuacionAnterior.innerText = 'Juega una partida para guardar una puntuación.';
+    }
+    console.log(localStorage.getItem('mejorRegistro'));
 }
 
 
@@ -404,9 +463,6 @@ function reiniciarJuego() {
     // Limpiar el array de cartas
     arrayCartas = [];
 
-
-
-    console.log(arrayCartas);
 
     // Ocultar el mensaje final si está visible
     const mensajeFinal = document.getElementById('mensaje-final');
