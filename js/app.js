@@ -1,5 +1,5 @@
 // DATOS
-const numeroCartas = 2;
+const numeroCartas = 4;
 const imagenesDorsoCartas = [
     'images/Dorso/DorsoComida.jpg',
     'images/Dorso/DorsoComida2.jpg'
@@ -15,13 +15,13 @@ const imagenesCartas = [
     '/images/Imagenes/Roque Nublo GC.png',
     '/images/Imagenes/Teide TNF.png',
     '/images/Imagenes/Timanfaya  LNZ.png',
-    '/images/Imagenes/carreteraTenerife.jpg',
-    '/images/Imagenes/corralejo.jpg',
+    '/images/Imagenes/carreteraTenerife TNF.jpg',
+    '/images/Imagenes/corralejo FTV.jpg',
     '/images/Imagenes/Hierro.webp',
     '/images/Imagenes/HierroeEden.jpg',
-    '/images/Imagenes/IsladeLobos.jpg',
-    '/images/Imagenes/punta-brava.jpg',
-    '/images/Imagenes/temerifeplaya.jpg',
+    '/images/Imagenes/IsladeLobos FTV.jpg',
+    '/images/Imagenes/punta-brava TNF.jpg',
+    '/images/Imagenes/temerifeplaya TNF.jpg',
 ];
 
 //VISTAS
@@ -153,6 +153,8 @@ function cartaPulsada(e) {
                     cartasBocaArriba.forEach(carta => carta.estado = 'resuelta');
                     // Actualiza la interfaz para reflejar la resolución de la pareja
                     sumarparejasResueltas();
+
+                    buscarIsla(carta);
                 } else {
                     // Si las cartas no coinciden, las voltea de nuevo después de un breve período de tiempo
                     setTimeout(() => {
@@ -166,11 +168,84 @@ function cartaPulsada(e) {
                 // Reinicia el contador de cartas boca arriba
                 partida.numCartasBocaArriba = 0;
             }
-            // Comprueba si el juego ha sido ganado
-            ganar();
         }
     }
 }
+
+function buscarIsla(carta) {
+    console.log(carta);
+    const urlCarta = carta.imagen; // URL de la primera carta boca arriba
+    console.log(urlCarta);
+    const nombreIslaCarta = obtenerNombreIsla(urlCarta);
+
+    const informacionIsla = obtenerInformacion(nombreIslaCarta); // Obtener información sobre la isla
+
+    // Mostrar la información de la isla en la ventana modal
+    abrirVentanaModal(obtenerImagen(nombreIslaCarta), nombreIslaCarta, informacionIsla);
+
+}
+
+function obtenerNombreIsla(url) {
+    const regExpHierro = new RegExp('Hierro');
+    const regExpGraciosa = new RegExp('Graciosa');
+    const regExpLaPalma = new RegExp('Palma');
+    const regExpLaurisilvaLaGomera = new RegExp('Gomera');
+    const regExpGranCanaria = new RegExp('GC');
+    const regExpFuerteventura = new RegExp('FTV');
+    const regExpTenerife = new RegExp('TNF');
+    const regExpLanzarote = new RegExp('LNZ');
+
+    if (regExpHierro.test(url)) {
+        return 'El Hierro';
+    } else if (regExpGraciosa.test(url)) {
+        return 'La Graciosa';
+    } else if (regExpLaPalma.test(url)) {
+        return 'La Palma';
+    } else if (regExpLaurisilvaLaGomera.test(url)) {
+        return 'La Gomera';
+    } else if (regExpGranCanaria.test(url)) {
+        return 'Gran Canaria';
+    } else if (regExpFuerteventura.test(url)) {
+        return 'Fuerteventura';
+    } else if (regExpTenerife.test(url)) {
+        return 'Tenerife';
+    } else if (regExpLanzarote.test(url)) {
+        return 'Lanzarote';
+    } else {
+        return 'Nombre de isla no encontrado'; // Si no coincide con ninguna expresión
+    }
+}
+
+function obtenerInformacion(nombreIsla) {
+    const informacionIslas = {
+        'Fuerteventura': `Fuerteventura es famosa por sus impresionantes playas de arena dorada que se extienden a lo largo de la costa. Algunas de las más populares incluyen Playa de Corralejo, Playa de Sotavento y Playa de Cofete. Fuerteventura tiene un paisaje volcánico único, con vastas extensiones de lava petrificada que se asemejan a un desierto lunar.`,
+        'Gran Canaria': `Uno de los puntos destacados de la isla son las Dunas de Maspalomas, un paisaje de dunas de arena que se extiende hasta el mar y se asemeja a un desierto. En el centro de la isla se encuentra el Parque Nacional de Garajonay, declarado Patrimonio de la Humanidad por la UNESCO. Es un bosque de laurisilva subtropical con una gran biodiversidad. La ciudad de Las Palmas, la capital de la isla, cuenta con un casco antiguo encantador con arquitectura colonial bien conservada, como la Casa de Colón, un museo que rinde homenaje a Cristóbal Colón. La isla es conocida por tener una gran variedad de microclimas debido a su topografía diversa. Puedes encontrar desde zonas desérticas hasta áreas montañosas con temperaturas más frescas.`,
+        'Lanzarote': `El Parque Nacional de Timanfaya es el parque nacional más destacado de la isla de Lanzarote, que forma parte de las Islas Canarias en España. Este parque nacional es famoso por su paisaje volcánico y lunar. Timanfaya se creó como resultado de una serie de erupciones volcánicas que ocurrieron entre 1730 y 1736, y aún se considera una zona geotérmica activa. En el Parque Nacional de Timanfaya, los visitantes pueden admirar una variedad de formaciones volcánicas, campos de lava, cráteres y cenizas. El suelo es cálido debido a la actividad geotérmica, lo que ha llevado a la creación del "Restaurante El Diablo", donde la comida se cocina utilizando el calor natural del subsuelo.`,
+        'La Graciosa': `La Graciosa es la isla más pequeña del archipiélago de las Islas Canarias y se encuentra al norte de Lanzarote. Es famosa por su ambiente tranquilo y relajado. Al no permitirse el acceso de automóviles particulares en la isla (excepto vehículos de servicio), la contaminación y el ruido son prácticamente inexistentes. Está rodeada por una reserva marina, lo que la convierte en un lugar excepcional para el buceo, snorkel y la observación de la vida marina. Además, forma parte de la Reserva de la Biosfera del Archipiélago Chinijo, que incluye varios islotes cercanos. Esta designación destaca su importancia ecológica y la conservación de su entorno natural.`,
+        'Tenerife': `Tiene el Pico del Teide que es el pico más alto de España y uno de los volcanes más grandes del mundo. El Parque Nacional del Teide es un destino imprescindible para los amantes de la naturaleza y ofrece una gran variedad de senderos y vistas panorámicas espectaculares. Gran parte de la isla ha sido declarada Reserva de la Biosfera por la UNESCO debido a su diversidad natural y sus esfuerzos de conservación. Las aguas alrededor de Tenerife son un lugar importante para la observación de ballenas y delfines.`,
+        'La Palma': `La Palma se conoce comúnmente como "La Isla Bonita" debido a su asombrosa belleza natural, que incluye impresionantes paisajes, acantilados y exuberante vegetación. Es uno de los mejores lugares del mundo para la observación de estrellas, gracias a su cielo limpio y su baja contaminación lumínica. El Observatorio del Roque de los Muchachos es uno de los principales observatorios astronómicos del hemisferio norte. El Bosque de los Tilos es un lugar mágico, conocido por su laurisilva y por el impresionante sendero de Los Tiles, que lleva a través de un paisaje de cuento de hadas con árboles cubiertos de musgo y helechos.`,
+        'El Hierro': `El Hierro ha sido declarada Reserva de la Biosfera por la UNESCO debido a su compromiso con la sostenibilidad y la conservación del medio ambiente. La isla ha implementado políticas ecológicas y de energía renovable, incluyendo un innovador sistema de generación de energía a partir de fuentes renovables. El Sabinar es uno de los bosques de sabinas más antiguos de Europa. Estos árboles retorcidos por la acción de los vientos alisios son un elemento distintivo del paisaje de la isla. La isla es de origen volcánico y presenta paisajes impresionantes. El punto más alto, el Pico de Malpaso, ofrece vistas panorámicas del océano y la vecina isla de La Gomera.`,
+        'La Gomera': `La laurisilva es un bosque subtropical húmedo que se caracteriza por su exuberante vegetación, que incluye árboles perennes de hojas verdes brillantes, helechos, musgos y líquenes. Estos bosques suelen estar envueltos en niebla y reciben una cantidad significativa de lluvia, lo que contribuye a su biodiversidad. Ha sido declarado Patrimonio de la Humanidad por la UNESCO.`
+    };
+
+    return informacionIslas[nombreIsla];
+}
+
+function obtenerImagen(nombreIsla) {
+    const imagenesIslas = {
+        'Fuerteventura': './images/ImagenesModal/Fuerteventura.jpg',
+        'Gran Canaria': './images/ImagenesModal/Gran_Canaria.jpg',
+        'Lanzarote': './images/ImagenesModal/Lanzarote.jpg',
+        'La Graciosa': './images/ImagenesModal/LaGraciosa.jpeg',
+        'Tenerife': './images/ImagenesModal/Tenerife.jpeg',
+        'La Palma': './images/ImagenesModal/LaPalma.jpeg',
+        'El Hierro': './images/ImagenesModal/ElHierro.jpeg',
+        'La Gomera': './images/ImagenesModal/LaGomera.jpeg',
+    };
+
+    return imagenesIslas[nombreIsla];
+}
+
 
 //Función para la añadir animación
 function animacion(cartas) {
@@ -183,6 +258,46 @@ function animacion(cartas) {
         }, 300);
     })
 }
+
+// Lógica para abrir y cerrar la ventana modal
+function abrirVentanaModal(imagen, nombreIsla, informacionIsla) {
+    detenerContadorTiempo(); // Detener el contador de tiempo
+    const modal = document.getElementById('modal');
+    const modalContenido = document.getElementById('modal-contenido');
+    const modalCerrar = document.getElementById('modal-cerrar');
+
+    // Mostrar contenido en la ventana modal
+    modalContenido.innerHTML = `
+        <img src="${imagen}" alt="Imagen de la isla" />
+        <h2>${nombreIsla}</h2>
+        <p>${informacionIsla}</p>
+    `;
+
+    modal.style.display = 'block'; // Mostrar la ventana modal
+    arrayCartas.forEach(carta => {
+        carta = document.getElementById(carta.id)
+        carta.style.display = 'none';
+    })
+    
+
+    // Cerrar la ventana modal después de 8 segundos
+    setTimeout(() => {
+        modalCerrar.style.display = 'block';
+        console.log('cerrar');
+    }, 2000);
+
+    // Evento para cerrar la ventana modal
+    modalCerrar.addEventListener('click', () => {
+        console.log('cerrar modal');
+        modal.style.display = 'none';
+        arrayCartas.forEach(carta => {
+            carta = document.getElementById(carta.id)
+            carta.style.display = 'block';
+        })
+        reiniciarContadorTiempo(); // Reiniciar el contador de tiempo
+    });
+}
+
 
 
 
@@ -240,6 +355,12 @@ function sumarparejasResueltas() {
     const parejasResueltasElement = document.getElementById('parejas-resueltas');
     parejasResueltasElement.textContent = 'Parejas resueltas: ' + partida.numParejasResueltas;
 }
+
+
+// ----------------------------------------------------------------
+//          ---------- FINAL DEL JUEGO ----------------
+// ----------------------------------------------------------------
+
 
 
 function ganar() {
@@ -330,40 +451,4 @@ function actualizarTiempo() {
 
     const tiempoMostrado = `${minutos < 10 ? '0' + minutos : minutos}:${segundos < 10 ? '0' + segundos : segundos}`;
     document.getElementById('tiempo').innerText = `Tiempo: ${tiempoMostrado}`;
-}
-
-
-
-
-
-
-
-
-// Lógica para abrir y cerrar la ventana modal
-function abrirVentanaModal(imagen, nombreIsla, informacionIsla) {
-    detenerContadorTiempo(); // Detener el contador de tiempo
-    const modal = document.getElementById('modal');
-    const modalContenido = document.getElementById('modal-contenido');
-    const modalCerrar = document.getElementById('modal-cerrar');
-
-    // Mostrar contenido en la ventana modal
-    modalContenido.innerHTML = `
-        <img src="${imagen}" alt="Imagen de la isla" />
-        <h2>${nombreIsla}</h2>
-        <p>${informacionIsla}</p>
-        <button id="cerrar-modal">Cerrar</button>
-    `;
-
-    modal.style.display = 'block'; // Mostrar la ventana modal
-
-    // Cerrar la ventana modal después de 8 segundos
-    setTimeout(() => {
-        modalCerrar.style.display = 'block';
-    }, 8000);
-
-    // Evento para cerrar la ventana modal
-    modalCerrar.addEventListener('click', () => {
-        modal.style.display = 'none';
-        reiniciarContadorTiempo(); // Reiniciar el contador de tiempo
-    });
 }
